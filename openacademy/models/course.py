@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models
+from odoo import fields, models,api
 
 
 class Course(models.Model):
@@ -29,3 +29,8 @@ class Session(models.Model):
     instructor_id = fields.Many2one('openacademy.partner', string="Instructor")
     course_id = fields.Many2one('openacademy.course', ondelete='cascade', string="Course", required=True)
     attendee_ids = fields.Many2many('openacademy.partner', string="Attendees")
+    attendees_count = fields.Integer(compute='_compute_attendees_count',string="Count of Attendees")
+    
+    @api.depends('attendee_ids')
+    def _compute_attendees_count(self):
+        self.attendees_count = len(self.attendee_ids)
