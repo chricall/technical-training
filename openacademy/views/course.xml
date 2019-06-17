@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!-- base structure of product.template, common with product.product -->
+        <record model="ir.actions.act_window" id="action_course">
+            <field name="name">Course</field>
+            <field name="res_model">openacademy.course</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_session">
+            <field name="name">Session</field>
+            <field name="res_model">openacademy.session</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem id="openacademy" name="OpenAcademy" web_icon="openacademy,static/description/icon.png" sequence="-100"/>
+        <menuitem id="openacademy_Mainmenu" name="Main Menu" parent="openacademy"/>
+        
+        <menuitem name="Course"
+            id="menu_course"
+            web_icon="account,static/description/icon.png"
+            parent="openacademy_Mainmenu"
+            action="action_course"/>
+        
+        <menuitem name="Session"
+            id="menu_session"
+            web_icon="account,static/description/icon.png"
+            parent="openacademy_Mainmenu"
+            action="action_session"/>
+        
+        <record id="course_template_tree_view" model="ir.ui.view">
+            <field name="name">openacademy.course.treeview</field>
+            <field name="model">openacademy.course</field>
+            <field name="arch" type="xml">
+                <tree string="Courses" default_order="name">
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="level"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="course_template_form_view" model="ir.ui.view">
+            <field name="name">openacademy.course.common.form</field>
+            <field name="model">openacademy.course</field>
+            <field name="arch" type="xml">
+                <form string="Course">
+                    <sheet>
+                        <group name="course_name" string="Details">
+                            <field name="name"/>
+                            <field name="actively"/>
+                        </group>
+                        <group name="course_level" string="Level">
+                            <field name="level"/>
+                        </group>
+                        <notebook>
+                        <page string="Course Details" name="course_details">
+                            <p>Details are above already</p>
+                        </page>
+                        <page string="Responsable People" name="course_responsible">   
+                            <field name="responsible_id"/>
+                        </page>
+                        <page string="Sessions" name="course_sessions">   
+                            <field name="session_ids"/>
+                        </page>
+                    </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="openacademy_course_search" model="ir.ui.view">
+            <field name="name">openacademy.courses.searc</field>
+            <field name="model">openacademy.course</field>
+            <field name="arch" type="xml">
+                <search string="Search Courses">
+                    <field name="responsible_id" string="Instructor" filter_domain="[('responsible_id.instructor','=',True)]"/>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="level"/>
+                    <filter string="Actively" name="actively" domain="[('actively', '=', True)]"/>
+                </search>
+            </field>
+        </record>
+        
+        <record id="session_template_form_view" model="ir.ui.view">
+            <field name="name">openacademy.session.common.form</field>
+            <field name="model">openacademy.session</field>
+            <field name="arch" type="xml">
+                <form string="Session">
+                    <sheet>
+                        <group>
+                            <group name="session_name" string="Details">
+                                <field name="name"/>
+                                <field name="state"/>
+                                <field name="seats"/>
+                                <field name="taken_seats" widget="percentpie"/>
+                            </group>                            
+                            <group name="instructor_id" string="Instructor">
+                                <field name="instructor_id"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Attendees" name="attendees">   
+                                <field name="attendee_ids"/>
+                            </page>
+                    </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        
+    </data>
+</odoo>
+        

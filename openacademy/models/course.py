@@ -8,6 +8,7 @@ class Course(models.Model):
 
     name = fields.Char(string='Title', required=True)
     description = fields.Text()
+    actively = fields.Boolean(default=True)
 
     responsible_id = fields.Many2one('openacademy.partner', string="Responsible")
     session_ids = fields.One2many('openacademy.session', 'course_id', string="Sessions")
