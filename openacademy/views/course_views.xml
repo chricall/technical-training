@@ -20,7 +20,7 @@
                 <sheet>
                     <group>
                         <field name="name"/>
-                        <field name="responsible_id"/>
+                        <field name="responsible_id" domain="[('instructor','=',True)]"/>
                         <field name="level"/>
                     </group>
                     <notebook>
