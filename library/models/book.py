@@ -19,10 +19,10 @@ class Books(models.Model):
 
 class BookCopy(models.Model):
     _name = "library.bookcopy"
-#    _inherits = {'library.book': 'book_id'} #because we have delegate is true in Book_id
+    _inherits = {'library.book': 'book_id'} #because we have delegate is true in Book_id
     _description = "Book copy"
     
-    book_id = fields.Many2one("library.book",string="Book",required=True,ondelete="cascade",delegate=True)
+    book_id = fields.Many2one("library.book",string="Book",required=True,ondelete="cascade")
     name = fields.Char(string="Copy name")
     uniqueid = fields.Char(string="Internal Reference")
     
