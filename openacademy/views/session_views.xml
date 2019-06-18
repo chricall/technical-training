@@ -25,7 +25,11 @@
         <field name="name">openacademy.session.form</field>
         <field name="model">openacademy.session</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Session" class="o_sale_order">
+                <header>
+                    <button name="action_confirm" type="object" string="A simple button" states='draft' class="oe_highlight" confirm="Are you sure mate?"/>
+                    <field name="state" widget="statusbar" options="{'clickable':'1'}" />
+                </header>
                 <sheet>
                     <group>
                         <group>
@@ -42,7 +46,7 @@
                             <field name="duration"/>
                             <field name="seats"/>
                             <field name="taken_seats" widget="progressbar"/>
-                            <field name="state"/>
+
                         </group>
                     </group>
                     <label for="attendee_ids"/>

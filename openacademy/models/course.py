@@ -29,7 +29,7 @@ class Session(models.Model):
     name = fields.Char(required=True)
     description = fields.Html()
     active = fields.Boolean(default=True)
-    state = fields.Selection([('draft', "Draft"), ('confirmed', "Confirmed"), ('done', "Done")], default='draft')
+    state = fields.Selection([('draft', "Draft"), ('confirmed', "Confirmed"), ('done', "Done")])
     level = fields.Selection(related='course_id.level', readonly=True)
     responsible_id = fields.Many2one(related='course_id.responsible_id', readonly=True, store=True)
 
@@ -58,7 +58,8 @@ class Session(models.Model):
         for session in self:
             if session.taken_seats > 50:
                 msg = "This is confirmed"
-                session.message_post(body=msg)
+                #session.message_post(body=msg)
+                session.message_post(body=msg, subject="This is subject", message_type='email')
         return result
     
     @api.model
@@ -92,3 +93,7 @@ class Session(models.Model):
             }}
         delta = fields.Date.from_string(self.end_date) - fields.Date.from_string(self.start_date)
         self.duration = delta.days + 1
+    
+    def action_confirm(self):
+        for session in self:
+                session.state = 'confirmed'
