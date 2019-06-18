@@ -11,4 +11,35 @@
         <field name="res_model">library.copy</field>
         <field name="view_mode">tree,form</field>
     </record>
+    
+    <record id="book_form_view" model="ir.ui.view">
+        <field name="name">book.form.inherit</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <form string="Book">
+                <group name="Details">
+                    <field name="name"/>
+                    <field name="author_ids"/>
+                    <field name="edition_date"/>
+                </group>
+            </form>
+        </field>
+    </record>
+    
+    
+    <record id="bookcopy_form_view" model="ir.ui.view">
+        <field name="name">bookcopy.form.inherit</field>
+        <field name="model">library.copy</field>
+        <field name="inherit_id" ref="library.book_form_view"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <group name="Details" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </group>
+            <group name="Details" position='after'>
+                <label for="reference"/>
+                <field name="reference" string="Books references"/>
+            </group>
+        </field>
+    </record>
 </odoo>
