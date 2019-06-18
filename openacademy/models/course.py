@@ -24,7 +24,8 @@ class Course(models.Model):
 class Session(models.Model):
     _name = 'openacademy.session'
     _description = 'Session'
-
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    
     name = fields.Char(required=True)
     description = fields.Html()
     active = fields.Boolean(default=True)
@@ -50,12 +51,36 @@ class Session(models.Model):
                 session.taken_seats = 0.0
             else:
                 session.taken_seats = 100.0 * len(session.attendee_ids) / session.seats
+    
+    @api.multi
+    def write(self, vals):
+        result = super(Session, self).write(vals)
+        for session in self:
+            if session.taken_seats > 50:
+                msg = "This is confirmed"
+                session.message_post(body=msg)
+        return result
+    
+    @api.model
+    def create(self, vals):
+        session = super(Session, self).create(vals)
+        session.message_subscribe([session.instructor_id.id])
+        if session.taken_seats > 50:
+            msg = "This is confirmed"
+            session.message_post(body=msg)
+        return session
+    
+    @api.onchange('taken_seats')
+    def _change_status(self):
+        for session in self:
+            if session.taken_seats > 50:
+                session.state = 'confirmed'
 
     @api.depends('attendee_ids')
     def _get_attendees_count(self):
         for session in self:
             session.attendees_count = len(session.attendee_ids)
-
+    
     @api.onchange('start_date', 'end_date')
     def _compute_duration(self):
         if not (self.start_date and self.end_date):

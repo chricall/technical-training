@@ -16,6 +16,7 @@
                 <field name="seats"/>
                 <field name="taken_seats" widget="progressbar"/>
                 <field name="attendees_count"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
@@ -41,13 +42,20 @@
                             <field name="duration"/>
                             <field name="seats"/>
                             <field name="taken_seats" widget="progressbar"/>
+                            <field name="state"/>
                         </group>
                     </group>
                     <label for="attendee_ids"/>
                     <field name="attendee_ids"/>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
             </form>
         </field>
+        
     </record>
 
     <record id="session_view_pivot" model="ir.ui.view">
@@ -66,4 +74,5 @@
         <field name="res_model">openacademy.session</field>
         <field name="view_mode">tree,form,pivot</field>
     </record>
+    
 </odoo>
