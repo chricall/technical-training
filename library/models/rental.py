@@ -1,21 +1,28 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
-
+import logging
+from odoo import exceptions
 
 class Rentals(models.Model):
     _name = 'library.rental'
     _description = 'Book rental'
+    
+    _inherit = ['mail.thread']
 
     customer_id = fields.Many2one('res.partner', string='Customer')
     copy_id = fields.Many2one('library.copy', string="Book Copy")
     book_id = fields.Many2one('library.book', string='Book', related='copy_id.book_id', readonly=True)
 
     rental_date = fields.Date(default=fields.Date.context_today)
-    return_date = fields.Date()
+    return_date = fields.Date(default=fields.Date.context_today)
 
     customer_address = fields.Text(compute='_compute_customer_address')
     customer_email = fields.Char(related='customer_id.email')
-
+    
+    returned = fields.Boolean(string="Returned")
+    fee = fields.Float(string="Standard Fee") 
+    totalfee = fields.Float(string="Standard (+ extra)")
+    
     book_authors = fields.Many2many(related='copy_id.author_ids')
     book_edition_date = fields.Date(related='copy_id.edition_date')
     book_publisher = fields.Many2one(related='copy_id.publisher_id')
@@ -23,3 +30,46 @@ class Rentals(models.Model):
     @api.depends('customer_id')
     def _compute_customer_address(self):
         self.customer_address = self.customer_id.address_get()
+    
+    """ @api.depends('return_date','rental_date')
+    def _calculate_fee(self):
+        if(self.returned == False):
+            for rec in self:
+                days = fields.Date.from_string(rec.return_date) - fields.Date.from_string(rec.rental_date)
+                rec.fee = days.days * 0.10
+
+    
+    @api.depends('return_date','rental_date')
+    def _calculate_total(self):
+        if(self.returned == False):
+            for rec in self:
+                if rec._check_expiry() and not rec.returned:
+                    extradays = fields.Date.from_string(fields.Date.today()) - fields.Date.from_string(rec.return_date)
+                    rec.totalfee = (extradays * 0.50) + rec.fee
+    """
+    
+    def _check_expiry(self):
+        if(self.return_date < fields.Date.today()):
+            return True
+        return False
+    
+    def action_calculate(self):
+        for rec in self:
+            days = fields.Date.from_string(rec.return_date) - fields.Date.from_string(rec.rental_date)
+            rec.fee = days.days * 0.10
+            rec.totalfee = rec.fee
+            if rec._check_expiry():
+                extradays = fields.Date.from_string(fields.Date.today()) - fields.Date.from_string(rec.return_date)
+                rec.totalfee += (extradays.days * 0.50)
+    
+    def action_reminder(self):
+        for rec in self:
+            if(rec._check_expiry()):
+                  rec.env.ref('library.rental_reminder_mail_template').send_mail(rec.id)
+    
+    def action_return(self):
+        for rec in self:
+            rec.action_calculate()
+            rec.returned = True
+            rec.customer_id.owed += rec.totalfee
+

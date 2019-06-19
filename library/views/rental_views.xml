@@ -1,8 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<odoo>    
+    <record id="rental_view_list" model="ir.ui.view">
+        <field name="name">library.rental.tree</field>
+        <field name="model">library.rental</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="customer_id"/>
+                <field name="book_id"/>
+                <field name="rental_date"/>
+                <field name="return_date"/>
+                <field name="fee"/>
+                <field name="totalfee"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="rental_view_form" model="ir.ui.view">
+        <field name="name">library.rental.form</field>
+        <field name="model">library.rental</field>
+        <field name="arch" type="xml">
+            <form string="Rental" class="o_sale_order">
+                <header>
+                    <button name="action_return" type="object" attrs="{'invisible': [('returned', '=', True)]}" string="Return" class="oe_highlight"/>
+                    <button name="action_reminder" type="object" attrs="{'invisible': [('returned', '=', True)]}" string="Remind client"/>
+                    <!--field name="state" widget="statusbar" options="{'clickable':'1'}" /-->
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Rental Details">
+                            <field name="copy_id"/>
+                            <field name="rental_date"/>
+                            <field name="return_date"/>
+                            <field name="fee"/>
+                            <field name="totalfee"/>
+                            <field name="returned" readonly="True"/>
+                        </group>
+                        <group string="Client Details">
+                            <field name="customer_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
     <record id="rental_action" model="ir.actions.act_window">
         <field name="name">Rentals</field>
         <field name="res_model">library.rental</field>
         <field name="view_mode">tree,form</field>
     </record>
+    
+    
+    <record id="rental_reminder_mail_template" model="mail.template">
+      <field name="name">Rental Reminder</field>
+      <field name="email_from">"${user.name|safe}" &lt;${user.email|safe}&gt;</field>
+      <field name="email_to">${object.customer_id.email}</field>
+      <field name="subject">Rental Reminder</field>
+      <field name="model_id" ref="library.model_library_rental"/>
+      <field name="auto_delete" eval="True"/>
+      <field name="body_html" type="xml">
+          <p>Dear sir</p>
+          <p>Kindly be reminder that you need to return back the book ${object.book_id.name} to avoid fines</p>
+      </field>
+  </record>
 </odoo>

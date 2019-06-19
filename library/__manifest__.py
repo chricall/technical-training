@@ -21,7 +21,7 @@
     'version':     '0.5',
 
     # any module necessary for this one to work correctly
-    'depends':     ['base'],
+    'depends':     ['base','mail'],
 
     # always loaded
     'data':        [
@@ -31,6 +31,7 @@
         "views/rental_views.xml",
         "views/menu_views.xml",
         "data/library_data.xml",
+        #"data/cron_rentalfeeupdate.xml"
     ],
     # only loaded in demonstration mode
     'demo':        [],

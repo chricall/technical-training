@@ -4,8 +4,9 @@ from odoo import api, exceptions, fields, models
 
 class Course(models.Model):
     _name = 'openacademy.course'
-    _description = 'Course'
-
+    _description = 'Course'    
+    
+    
     name = fields.Char(name='Title', required=True)
     description = fields.Text()
 
@@ -56,10 +57,11 @@ class Session(models.Model):
     def write(self, vals):
         result = super(Session, self).write(vals)
         for session in self:
+            session.message_subscribe([session.instructor_id.id])
             if session.taken_seats > 50:
                 msg = "This is confirmed"
                 #session.message_post(body=msg)
-                session.message_post(body=msg, subject="This is subject", message_type='email')
+                session.message_post(body=msg, subject="This is subject", subtype="mail.mt_comment")
         return result
     
     @api.model
@@ -68,7 +70,7 @@ class Session(models.Model):
         session.message_subscribe([session.instructor_id.id])
         if session.taken_seats > 50:
             msg = "This is confirmed"
-            session.message_post(body=msg)
+            session.message_post(body=msg, subtype="mail.mt_comment")
         return session
     
     @api.onchange('taken_seats')
