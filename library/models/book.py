@@ -23,5 +23,7 @@ class BookCopy(models.Model):
 
     book_id = fields.Many2one('library.book', string="Book", required=True, ondelete="cascade", delegate=True)
     reference = fields.Char()
-
+    active = fields.Boolean(default=True,string="Available Copy")
+    inrent = fields.Boolean(string="In rent")
+    
     rental_ids = fields.One2many('library.rental', 'copy_id', string='Rentals')

@@ -24,6 +24,8 @@
                 <header>
                     <button name="action_return" type="object" attrs="{'invisible': [('returned', '=', True)]}" string="Return" class="oe_highlight"/>
                     <button name="action_reminder" type="object" attrs="{'invisible': [('returned', '=', True)]}" string="Remind client"/>
+                    <button name="action_lost" type="object" attrs="{'invisible': [('returned', '=', True)]}" string="Set as lost" confirm="Are you sure to set this as lost?"/>
+                    
                     <field name="state" widget="statusbar" options="{'clickable':'0'}" />
                 </header>
                 <sheet>

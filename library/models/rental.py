@@ -2,6 +2,7 @@
 from odoo import api, fields, models
 import logging
 from odoo import exceptions
+from odoo.exceptions import ValidationError
 
 class Rentals(models.Model):
     _name = 'library.rental'
@@ -22,12 +23,18 @@ class Rentals(models.Model):
     returned = fields.Boolean(string="Returned")
     fee = fields.Float(string="Standard Fee") 
     totalfee = fields.Float(string="Standard (+ extra)")
-    state = fields.Selection([('progress', 'In progress'), ('expired', 'Expired'), ('returned', 'Returned')],string='State', default='progress')
+    state = fields.Selection([('progress', 'In progress'), ('expired', 'Expired'), ('returned', 'Returned'),('lost','Lost')],string='State', default='progress')
     
     book_authors = fields.Many2many(related='copy_id.author_ids')
     book_edition_date = fields.Date(related='copy_id.edition_date')
     book_publisher = fields.Many2one(related='copy_id.publisher_id')
 
+    @api.onchange('rental_date','return_date')
+    def _validate_dates(self):
+        for rec in self:
+            if rec.rental_date > rec.return_date:
+                 raise ValidationError('Return date is sooner that rental? Impossible.')
+    
     @api.depends('customer_id')
     def _compute_customer_address(self):
         self.customer_address = self.customer_id.address_get()
@@ -48,6 +55,13 @@ class Rentals(models.Model):
                     extradays = fields.Date.from_string(fields.Date.today()) - fields.Date.from_string(rec.return_date)
                     rec.totalfee = (extradays * 0.50) + rec.fee
     """
+    # ----- TODO: refactor ---------
+    
+    @api.model
+    def create(self, values):
+        so = super(Rentals, self).create(values)
+        so.copy_id.inrent = True
+        return so
     
     def _set_status(self):
         for rec in self:
@@ -56,6 +70,16 @@ class Rentals(models.Model):
                 rec.state = 'expired'
             if rec.returned:
                 rec.state = 'returned'
+    
+    def action_lost(self):
+        for rec in self:
+            rec.action_calculate()
+            rec.state = 'lost'
+            rec.returned = True
+            rec.totalfee += 10.00
+            rec.customer_id.owed += rec.totalfee
+            rec.copy_id.active = False
+            rec.copy_id.inrent = False
     
     def _check_expiry(self):
         if(self.return_date < fields.Date.today()):
@@ -83,4 +107,6 @@ class Rentals(models.Model):
             rec.returned = True
             rec.customer_id.owed += rec.totalfee
             rec._set_status()
+            rec.copy_id.inrent = False
+
 

@@ -46,6 +46,8 @@
             </field>
             <field name="isbn" position="after">
                 <field name="reference"/>
+                <field name="active" readonly="True"/>
+                <field name="inrent" readonly="True"/>
             </field>
             <page name="copies" position="replace">
                 <page string="Rentals" name="rentals">
