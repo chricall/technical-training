@@ -31,6 +31,7 @@
         "views/rental_views.xml",
         "views/menu_views.xml",
         "data/library_data.xml",
+        "data/returnbatch.xml"
         #"data/cron_rentalfeeupdate.xml"
     ],
     # only loaded in demonstration mode

@@ -22,6 +22,7 @@ class Rentals(models.Model):
     returned = fields.Boolean(string="Returned")
     fee = fields.Float(string="Standard Fee") 
     totalfee = fields.Float(string="Standard (+ extra)")
+    state = fields.Selection([('progress', 'In progress'), ('expired', 'Expired'), ('returned', 'Returned')],string='State', default='progress')
     
     book_authors = fields.Many2many(related='copy_id.author_ids')
     book_edition_date = fields.Date(related='copy_id.edition_date')
@@ -48,6 +49,14 @@ class Rentals(models.Model):
                     rec.totalfee = (extradays * 0.50) + rec.fee
     """
     
+    def _set_status(self):
+        for rec in self:
+            rec.state = 'progress'
+            if rec._check_expiry():
+                rec.state = 'expired'
+            if rec.returned:
+                rec.state = 'returned'
+    
     def _check_expiry(self):
         if(self.return_date < fields.Date.today()):
             return True
@@ -61,6 +70,7 @@ class Rentals(models.Model):
             if rec._check_expiry():
                 extradays = fields.Date.from_string(fields.Date.today()) - fields.Date.from_string(rec.return_date)
                 rec.totalfee += (extradays.days * 0.50)
+            rec._set_status()
     
     def action_reminder(self):
         for rec in self:
@@ -72,4 +82,5 @@ class Rentals(models.Model):
             rec.action_calculate()
             rec.returned = True
             rec.customer_id.owed += rec.totalfee
+            rec._set_status()
 
