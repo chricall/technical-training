@@ -23,6 +23,6 @@ class BookCopy(models.Model):
     _description = "Book copy"
     
     book_id = fields.Many2one("library.book",string="Book",required=True,ondelete="cascade")
-    name = fields.Char(string="Copy name")
+    #name = fields.Char(string="Copy name")
     uniqueid = fields.Char(string="Internal Reference")
     
