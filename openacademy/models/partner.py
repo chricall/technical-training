@@ -7,9 +7,10 @@ class Partner(models.Model):
 
     instructor = fields.Boolean(default=False)
     session_ids = fields.Many2many('openacademy.session', string="Attended Sessions", readonly=True)
-
+    
     level = fields.Integer(compute="_get_level", string="Level", store=True)
-
+    
+    
     @api.depends('category_id', 'category_id.name')
     def _get_level(self):
         for partner in self:

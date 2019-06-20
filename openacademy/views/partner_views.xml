@@ -18,7 +18,7 @@
             </tree>
         </field>
     </record>
-
+    
     <record id="partner_view_form" model="ir.ui.view">
         <field name="name">openacadmey.partner.form</field>
         <field name="model">res.partner</field>
@@ -72,4 +72,12 @@
         <field name="view_id" ref="openacademy.partner_view_form"/>
         <field name="act_window_id" ref="openacademy.partner_action"/>
     </record>
+    
+    <act_window id="launch_the_wizard"
+            name="Launch the Wizard"
+            src_model="res.partner"
+            res_model="openacademy.wizard"
+            view_mode="form"
+            target="new"
+            key2="client_action_multi"/>
 </odoo>

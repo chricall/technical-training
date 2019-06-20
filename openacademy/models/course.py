@@ -16,7 +16,8 @@ class Course(models.Model):
 
     level = fields.Selection([(1, 'Easy'), (2, 'Medium'), (3, 'Hard')], string="Difficulty Level")
     session_count = fields.Integer(compute="_compute_session_count")
-
+    participants_count = fields.Integer(compute="_count_participants")
+    
     _sql_constraints = [
         ('name_description_check', 'CHECK(name != description)',
          "The title of the course should not be the description"),
@@ -43,8 +44,23 @@ class Course(models.Model):
     def _compute_session_count(self):
         for course in self:
             course.session_count = len(course.session_ids)
-
-
+            
+    @api.depends('session_ids.attendee_ids')
+    def _count_participants(self):
+        for rec in self:
+            rec.participants_count = len(rec.mapped('session_ids.attendee_ids'))
+            
+    @api.multi
+    def action_load_participants(self):
+        return {
+            'domain': [('id', 'in', self.mapped('session_ids.attendee_ids').ids)],
+            'name': 'Participants',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'res.partner',
+            'type': 'ir.actions.act_window'
+        } 
+    
 class Session(models.Model):
     _name = 'openacademy.session'
     _inherit = ['mail.thread']
