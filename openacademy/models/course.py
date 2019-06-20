@@ -3,7 +3,6 @@ from datetime import timedelta
 
 from odoo import api, exceptions, fields, models
 
-
 class Course(models.Model):
     _name = 'openacademy.course'
     _description = 'Course'
@@ -82,6 +81,8 @@ class Session(models.Model):
     state = fields.Selection([('draft', "Draft"), ('confirmed', "Confirmed"), ('done', "Done")], default='draft')
     level = fields.Selection(related='course_id.level', readonly=True)
     responsible_id = fields.Many2one(related='course_id.responsible_id', readonly=True, store=True)
+    
+    invoiced = fields.Boolean(default=False)
 
     start_date = fields.Date(default=fields.Date.context_today)
     end_date = fields.Date(string='End date', store=True, compute='_get_end_date', inverse='_set_end_date')
@@ -100,6 +101,24 @@ class Session(models.Model):
             'title':   title,
             'message': message,
         }}
+    
+    @api.multi
+    def action_invoice(self):
+        for session in self:
+            invoice = session.env['account.invoice'].search([('partner_id','=',session.instructor_id.id),('state','=','draft')])
+            
+            if not invoice: #here to add a line to this invoice
+                invoice = session.env['account.invoice'].create({
+                    'partner_id': session.instructor_id.id
+                })
+            session.env['account.invoice.line'].create({
+                'invoice_id':invoice.id,
+                'name':session.name,
+                'price_unit':5.0,
+                'account_id':self.env.ref('l10n_generic_coa.1_conf_a_sale').id
+            })
+            session.invoiced = True
+        
 
     @api.depends('seats', 'attendee_ids')
     def _compute_taken_seats(self):
