@@ -1,3 +1,8 @@
 id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
-course_manager,Course Manager,model_openacademy_course,,1,1,1,1
-session_manager,Session Manager,model_openacademy_session,,1,1,1,1
+course_manager_arch,Course Manager Archmaster,model_openacademy_course,openacademy.archmasters_group,1,1,1,1
+session_manager_arch,Session Manager Archmaster,model_openacademy_session,openacademy.archmasters_group,1,1,1,1
+course_manager_maester,Course Manager Master,model_openacademy_course,openacademy.masters_group,1,1,0,0
+session_manager_maester,Session Manager Master,model_openacademy_session,openacademy.masters_group,1,1,0,0
+course_manager_student,Course Manager Student,model_openacademy_course,openacademy.student_group,1,0,0,0
+session_manager_student,Session Manager Student,model_openacademy_session,openacademy.student_group,1,0,0,0
+contact_student,Contact Student,model_res_partner,openacademy.student_group,1,0,0,0
