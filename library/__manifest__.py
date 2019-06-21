@@ -21,7 +21,7 @@
     'version':     '0.1',
 
     # any module necessary for this one to work correctly
-    'depends':     ['base', 'product'],
+    'depends':     ['base', 'product', 'website'],
 
     # always loaded
     'data':        [
@@ -37,6 +37,7 @@
         "data/mail.xml",
         "data/library_data.xml",
         "data/prices.xml",
+        "templates/library.xml"
     ],
     # only loaded in demonstration mode
     'demo':        [],
